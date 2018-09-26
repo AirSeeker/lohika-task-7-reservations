@@ -10,4 +10,9 @@ router.route('/reservations/:reservation_id')
     .put(reservationsCtrl.updateReservation)
     .delete(reservationsCtrl.deleteReservation);
 
+
+router.route('/reservations/:reservation_id/orders')
+    .post(reservationsCtrl.createOrder)
+    .get(reservationsCtrl.getOrdersInfo);
+
 module.exports = router;

@@ -3,6 +3,8 @@ const BaseJoi = require('joi');
 const Extension = require('joi-date-extensions');
 const Joi = BaseJoi.extend(Extension);
 const moment = require('moment');
+const axios = require('axios');
+const config = require('../../config')[process.env.NODE_ENV];
 
 class ReservationsModel {
     constructor() {
@@ -221,6 +223,60 @@ class ReservationsModel {
         }
 
         return !!result;
+    }
+
+    /**
+     * Send request to Orders microservice
+     * @param body
+     * @returns boolean
+     */
+    async saveOrder(body) {
+        let result;
+        try {
+            result = await axios.post(`${config.ordersEndpoint}/api/orders`, body);
+        } catch (e) {
+            return false;
+        }
+
+        if (result.status === 201 && result.headers.location) {
+            try {
+                await knex('reservation_has_order')
+                    .returning('id')
+                    .insert({
+                        reservation_id: this.id,
+                        order_uri: result.headers.location
+                    });
+            } catch (e) {
+                return new Error(e.message);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    async findOrder() {
+        try {
+            let order = await knex('reservation_has_order')
+                .select(['order_uri'])
+                .where('reservation_id', this.id)
+                .limit(1);
+            if (order.length) {
+                let result = await axios.get(`${config.ordersEndpoint}${order[0].order_uri}`);
+
+                if (result.status === 200) {
+                    return result.data.meals.reduce((response, currentMeal) => {
+                        response.meals.push(currentMeal.name);
+                        return response;
+                    }, {meals: []});
+                }
+            }
+
+            return false;
+        } catch (e) {
+            return false;
+        }
     }
 }
 
