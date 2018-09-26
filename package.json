@@ -1,0 +1,33 @@
+{
+  "name": "NodeJSHomework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:unit": "mocha test/unit",
+    "test:integration": "mocha --exit --timeout=20000 test/integration",
+    "test:all": "mocha --exit --timeout=20000 --recursive test",
+    "test:coverage": "nyc --reporter=html npm run test:all",
+    "start": "export NODE_ENV=production || SET \"NODE_ENV=production\" &&  node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "joi": "^13.6.0",
+    "joi-date-extensions": "^1.2.0",
+    "knex": "^0.15.2",
+    "moment": "^2.22.2",
+    "pg": "^7.4.3"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "nyc": "^13.0.1",
+    "sinon": "^6.3.4",
+    "supertest": "^3.3.0"
+  }
+}
