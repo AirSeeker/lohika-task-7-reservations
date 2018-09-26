@@ -105,6 +105,54 @@ class Reservations {
 
         return res.status(404).send();
     }
+
+    static async createOrder(req, res) {
+        const model = new ReservationsModel();
+        if (!req.params.reservation_id || !model.validateId(req.params.reservation_id)) {
+            return res.status(400).send();
+        }
+
+        const result = await model.findOne();
+        if (result instanceof Error) {
+            return res.status(500).send();
+        }
+
+        if (!result) {
+            return res.status(404).send();
+        }
+
+        if (result) {
+            let result = await model.saveOrder(req.body);
+
+            if (result) {
+                return res.status(201).send();
+            }
+        }
+
+        return res.status(400).send();
+    }
+
+    static async getOrdersInfo(req, res) {
+        const model = new ReservationsModel();
+        if (!req.params.reservation_id || !model.validateId(req.params.reservation_id)) {
+            return res.status(400).send();
+        }
+
+        const result = await model.findOne();
+
+        if (result instanceof Error) {
+            return res.status(500).send();
+        }
+
+        if (result) {
+            let result = await model.findOrder();
+            if (result) {
+                return res.status(200).send(result);
+            }
+        }
+
+        return res.status(404).send();
+    }
 }
 
 module.exports = Reservations;
